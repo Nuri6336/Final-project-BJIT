@@ -1,4 +1,4 @@
-package com.healthcare.userservice.sequrity;
+package com.healthcare.userservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.healthcare.userservice.dto.UserLoginDto;

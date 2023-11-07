@@ -34,7 +34,7 @@ public class JWTUtils {
                 .compact();
     }
 
-    private static String generateRandomString(int length){
+    public static String generateRandomString(int length){
         StringBuilder returnValue = new StringBuilder(length);
         for (int i = 0;i<length;i++)
             returnValue.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));

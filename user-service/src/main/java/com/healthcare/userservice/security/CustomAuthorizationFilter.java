@@ -1,4 +1,4 @@
-package com.healthcare.userservice.sequrity;
+package com.healthcare.userservice.security;
 
 import com.healthcare.userservice.constants.AppConstants;
 import com.healthcare.userservice.utils.JWTUtils;
