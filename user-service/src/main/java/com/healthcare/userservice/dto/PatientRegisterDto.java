@@ -14,7 +14,6 @@ public class PatientRegisterDto {
     private String mobile;
     private String gender;
     private String password;
-    private String role;
 
     public void setAccessToken(String s) {
     }
