@@ -21,14 +21,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader(AppConstants.HEADER_STRING);
         if(header==null||!header.startsWith(AppConstants.TOKEN_PREFIX)){
             filterChain.doFilter(request,response);
         }else {
-            UsernamePasswordAuthenticationToken authenticationToken;
+            UsernamePasswordAuthenticationToken authenticationToken = null;
             try {
                 authenticationToken = getAuthenticationToken(header);
             } catch (Exception e) {
@@ -38,7 +37,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
         }
     }
-
     public UsernamePasswordAuthenticationToken getAuthenticationToken(String header) throws Exception {
         if(header != null){
             String token = header.replace(AppConstants.TOKEN_PREFIX, "");

@@ -5,29 +5,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PatientInfoDto {
+public class UserDto {
 
-    private String patientId;
+    private Long userId;
+    private String uniqueId;
 
     private String fname;
     private String lname;
     private String email;
-    private String address;
-
-    private LocalDate dateOfBirth;
-    private byte[] patient_image;
-
     private String mobile;
     private String gender;
-
-    private String status;
+    private String password;
+    private String role;
 
     private LocalDateTime dateOfRegistration;
+
+    public void setAccessToken(String s) {
+    }
 }
