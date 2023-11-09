@@ -16,6 +16,7 @@ public class AppConstants {
 
     public static final String USER_UNAUTHORIZED = "You are not authorized to access this!";
     public static final String USER_NOT_FOUND = "User does not exists!";
+    public static final String USER_ALREADY_EXISTS = "User already exists!";
     public static final String TOKEN_INVALID = "Token validation problem!";
 
 

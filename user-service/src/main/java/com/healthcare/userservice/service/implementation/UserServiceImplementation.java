@@ -2,7 +2,9 @@ package com.healthcare.userservice.service.implementation;
 
 import com.healthcare.userservice.constants.AppConstants;
 import com.healthcare.userservice.dto.UserDto;
+import com.healthcare.userservice.entity.PatientEntity;
 import com.healthcare.userservice.entity.UserEntity;
+import com.healthcare.userservice.repository.PatientRepository;
 import com.healthcare.userservice.repository.UserRepository;
 import com.healthcare.userservice.service.UserService;
 import com.healthcare.userservice.utils.JWTUtils;
@@ -27,11 +29,14 @@ import java.util.List;
 public class UserServiceImplementation implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PatientRepository patientRepository;
     @Autowired
     public EmailService emailService;
-    public UserServiceImplementation(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImplementation(UserRepository userRepository,
+                                     BCryptPasswordEncoder bCryptPasswordEncoder,PatientRepository patientRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.patientRepository = patientRepository;
     }
     @Override
     public UserDto createUser(UserDto user) throws Exception {
@@ -124,8 +129,11 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         UserEntity userEntity = userRepository.findByUserId(getCurrentUser().getUserId())
                 .orElseThrow(()->new Exception("User not found!"));
 
-        userEntity.setGender(userDto.getGender() != null ? userDto.getGender() : userEntity.getGender());
-        userEntity.setRole(userDto.getRole() != null ? userDto.getRole() : userEntity.getRole());
+        userEntity.setFname(userDto.getFname());
+        userEntity.setLname(userDto.getLname());
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setGender(userDto.getGender());
+        userEntity.setMobile(userDto.getMobile());
 
         userRepository.save(userEntity);
     }

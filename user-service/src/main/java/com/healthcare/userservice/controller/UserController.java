@@ -3,6 +3,8 @@ package com.healthcare.userservice.controller;
 import com.healthcare.userservice.constants.AppConstants;
 import com.healthcare.userservice.dto.UserDto;
 import com.healthcare.userservice.dto.UserLoginRequestDto;
+import com.healthcare.userservice.entity.PatientEntity;
+import com.healthcare.userservice.repository.PatientRepository;
 import com.healthcare.userservice.service.implementation.UserServiceImplementation;
 import com.healthcare.userservice.utils.JWTUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +26,9 @@ public class UserController {
     private UserServiceImplementation userServiceImplementation;
 
     @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/users/userId/{userId}")
@@ -39,7 +44,10 @@ public class UserController {
     @PostMapping("/users/register")
     public ResponseEntity<?> register (@RequestBody UserDto userDto) {
         try {
-            userServiceImplementation.createUser(userDto);
+            UserDto returnValue = userServiceImplementation.createUser(userDto);
+            PatientEntity patientEntity = new PatientEntity();
+            patientEntity.setPatientUniqueId(returnValue.getUniqueId());
+            patientRepository.save(patientEntity);
             return new ResponseEntity<>("User created successfully!", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);

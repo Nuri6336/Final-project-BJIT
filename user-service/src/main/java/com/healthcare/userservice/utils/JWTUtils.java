@@ -31,6 +31,7 @@ public class JWTUtils {
                 .signWith(SignatureAlgorithm.HS256, AppConstants.TOKEN_SECRET)
                 .compact();
     }
+
     private static String generateRandomString(int length){
         StringBuilder returnValue = new StringBuilder(length);
         for (int i = 0;i<length;i++)
