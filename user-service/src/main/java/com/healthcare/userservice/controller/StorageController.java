@@ -24,6 +24,13 @@ public class StorageController {
                 .body(uploadImage);
     }
 
+    @PostMapping("/fileSystem/doctor")
+    public ResponseEntity<?> uploadImageToFIleSystemOfDoctor(@RequestParam("image") MultipartFile file) throws Exception {
+        String uploadImage = service.uploadImageToFileSystemDoctor(file);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(uploadImage);
+    }
+
     @GetMapping("/fileSystem/{id}")
     public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String id) throws IOException {
         byte[] imageData=service.downloadImageFromFileSystem(id);
@@ -38,6 +45,12 @@ public class StorageController {
         service.deleteImage(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body("Image deleted successfully.");
+    }
 
+    @DeleteMapping("/fileSystem/doctor/delete/{id}")
+    public ResponseEntity<?> deleteFileOfDoctor(@PathVariable String id) throws Exception {
+        service.deleteImageOfDoctor(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Image deleted successfully.");
     }
 }

@@ -16,5 +16,6 @@ public class DoctorDto {
     private String professionalDescription;
     private String[] qualifications;
     private String[] specialities;
-    private byte[] doctorImage;
+    private String doctorImage;
+    private String roomNo;
 }

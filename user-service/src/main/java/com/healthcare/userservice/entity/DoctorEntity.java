@@ -18,9 +18,7 @@ public class DoctorEntity {
     private Long id;
 
     private String doctorUniqueID;
-
-    @Lob
-    private byte[] doctorImage;
+    private String doctorImage;
 
     private String address;
     private String age;

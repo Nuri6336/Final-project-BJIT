@@ -21,5 +21,5 @@ public class PatientEntity {
     private String patientImage;
 
     private String address;
-    private String age;
+    private Integer age;
 }

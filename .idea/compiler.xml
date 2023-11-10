@@ -5,10 +5,24 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
+          <entry name="$PROJECT_DIR$/../api-gateway/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="decision-support-service.main" />
+        <module name="scheduling-service.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="community-service" target="17" />
+      <module name="community-service.main" target="17" />
+      <module name="community-service.test" target="17" />
+      <module name="decision-support-service" target="17" />
+      <module name="decision-support-service.main" target="17" />
+      <module name="decision-support-service.test" target="17" />
+      <module name="notification-service" target="17" />
+      <module name="notification-service.main" target="17" />
+      <module name="notification-service.test" target="17" />
+      <module name="pharmacy-service" target="17" />
+      <module name="pharmacy-service.main" target="17" />
+      <module name="pharmacy-service.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -3,7 +3,9 @@ package com.healthcare.userservice.controller;
 import com.healthcare.userservice.constants.AppConstants;
 import com.healthcare.userservice.dto.UserDto;
 import com.healthcare.userservice.dto.UserLoginRequestDto;
+import com.healthcare.userservice.entity.DoctorEntity;
 import com.healthcare.userservice.entity.PatientEntity;
+import com.healthcare.userservice.repository.DoctorRepository;
 import com.healthcare.userservice.repository.PatientRepository;
 import com.healthcare.userservice.service.implementation.UserServiceImplementation;
 import com.healthcare.userservice.utils.JWTUtils;
@@ -29,6 +31,9 @@ public class UserController {
     private PatientRepository patientRepository;
 
     @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/users/userId/{userId}")
@@ -45,9 +50,17 @@ public class UserController {
     public ResponseEntity<?> register (@RequestBody UserDto userDto) {
         try {
             UserDto returnValue = userServiceImplementation.createUser(userDto);
-            PatientEntity patientEntity = new PatientEntity();
-            patientEntity.setPatientUniqueId(returnValue.getUniqueId());
-            patientRepository.save(patientEntity);
+
+            if (returnValue.getRole().equals(AppConstants.ROLE_PATIENT)){
+                PatientEntity patientEntity = new PatientEntity();
+                patientEntity.setPatientUniqueId(returnValue.getUniqueId());
+                patientRepository.save(patientEntity);
+            } else if (returnValue.getRole().equals(AppConstants.ROLE_DOCTOR)) {
+                DoctorEntity doctorEntity = new DoctorEntity();
+                doctorEntity.setDoctorUniqueID(returnValue.getUniqueId());
+                doctorRepository.save(doctorEntity);
+            }
+
             return new ResponseEntity<>("User created successfully!", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);

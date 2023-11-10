@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class PatientAddMoreInfoDto {
 
     private String address;
-    private String age;
+    private Integer age;
     private String patientImage;
 }

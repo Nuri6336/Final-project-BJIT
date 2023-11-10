@@ -1,10 +1,12 @@
 package com.healthcare.userservice.service.implementation;
 
 import com.healthcare.userservice.constants.AppConstants;
+import com.healthcare.userservice.entity.DoctorEntity;
 import com.healthcare.userservice.entity.FileData;
 import com.healthcare.userservice.entity.PatientEntity;
 import com.healthcare.userservice.entity.UserEntity;
 import com.healthcare.userservice.exception.UserNotExistsException;
+import com.healthcare.userservice.repository.DoctorRepository;
 import com.healthcare.userservice.repository.FileDataRepository;
 import com.healthcare.userservice.repository.PatientRepository;
 import com.healthcare.userservice.repository.UserRepository;
@@ -32,6 +34,9 @@ public class StorageService {
     private PatientRepository patientRepository;
 
     @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     private final String FOLDER_PATH = "D:/J2EE/HealthcareStorage/";
@@ -53,6 +58,29 @@ public class StorageService {
 
         patientEntity.setPatientImage(filePath);
         patientRepository.save(patientEntity);
+
+        if (fileData != null) {
+            return "file uploaded successfully : " + filePath;
+        }
+        return null;
+    }
+
+    public String uploadImageToFileSystemDoctor(MultipartFile file) throws Exception {
+        String filePath = FOLDER_PATH + file.getOriginalFilename();
+
+        DoctorEntity doctorEntity = doctorRepository.findByDoctorUniqueID(getCurrentUser().getUniqueId())
+                .orElseThrow(() -> new UserNotExistsException(AppConstants.USER_NOT_FOUND));
+
+        FileData fileData = fileDataRepository.save(FileData.builder()
+                .uniqueId(getCurrentUser().getUniqueId())
+                .name(file.getOriginalFilename())
+                .type(file.getContentType())
+                .filePath(filePath).build());
+
+        file.transferTo(new File(filePath));
+
+        doctorEntity.setDoctorImage(filePath);
+        doctorRepository.save(doctorEntity);
 
         if (fileData != null) {
             return "file uploaded successfully : " + filePath;
@@ -84,6 +112,29 @@ public class StorageService {
             fileDataRepository.delete(fileData);
             patientEntity.setPatientImage(null);
             patientRepository.save(patientEntity);
+        } else {
+            // Handle the case where the file with the given uniqueId is not found
+            throw new FileNotFoundException("File not found for uniqueId: " + uniqueId);
+        }
+    }
+
+    public void deleteImageOfDoctor(String uniqueId) throws Exception {
+        Optional<FileData> fileDataOptional = fileDataRepository.findByUniqueId(uniqueId);
+        DoctorEntity doctorEntity = doctorRepository.findByDoctorUniqueID(getCurrentUser().getUniqueId())
+                .orElseThrow(() -> new UserNotExistsException(AppConstants.USER_NOT_FOUND));
+
+        if (fileDataOptional.isPresent()) {
+            FileData fileData = fileDataOptional.get();
+            String filePath = fileData.getFilePath();
+
+            // Delete the file from storage
+            Path path = Paths.get(filePath);
+            Files.deleteIfExists(path);
+
+            // Delete the file data from the database
+            fileDataRepository.delete(fileData);
+            doctorEntity.setDoctorImage(null);
+            doctorRepository.save(doctorEntity);
         } else {
             // Handle the case where the file with the given uniqueId is not found
             throw new FileNotFoundException("File not found for uniqueId: " + uniqueId);

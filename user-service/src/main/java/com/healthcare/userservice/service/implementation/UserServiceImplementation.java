@@ -57,9 +57,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         } else if (Objects.equals(user.getRole(), AppConstants.ROLE_DOCTOR)) {
             String uniqueId = ("DOC" + JWTUtils.generateString(5)).toUpperCase();
             userEntity.setUniqueId(uniqueId);
-        }else {
-            String uniqueId = ("ADM" + JWTUtils.generateString(5)).toUpperCase();
-            userEntity.setUniqueId(uniqueId);
         }
 
         userEntity.setRole(user.getRole());

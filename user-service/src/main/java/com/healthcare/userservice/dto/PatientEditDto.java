@@ -13,7 +13,7 @@ public class PatientEditDto {
 
 
     private String address;
-    private String age;
+    private Integer age;
     private String patientImage;
 
     private String fname;

@@ -19,6 +19,6 @@ public class PatientProfileDto {
     private String gender;
 
     private String address;
-    private String age;
+    private Integer age;
     private String patientImage;
 }
