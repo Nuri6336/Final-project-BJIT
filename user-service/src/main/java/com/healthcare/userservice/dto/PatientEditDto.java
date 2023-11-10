@@ -14,7 +14,7 @@ public class PatientEditDto {
 
     private String address;
     private String age;
-    private byte[] patientImage;
+    private String patientImage;
 
     private String fname;
     private String lname;

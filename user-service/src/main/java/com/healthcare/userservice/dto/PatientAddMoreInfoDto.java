@@ -13,5 +13,5 @@ public class PatientAddMoreInfoDto {
 
     private String address;
     private String age;
-    private byte[] patientImage;
+    private String patientImage;
 }

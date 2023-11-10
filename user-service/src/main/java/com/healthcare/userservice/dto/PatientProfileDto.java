@@ -20,5 +20,5 @@ public class PatientProfileDto {
 
     private String address;
     private String age;
-    private byte[] patientImage;
+    private String patientImage;
 }

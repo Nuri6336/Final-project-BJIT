@@ -19,13 +19,10 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-    @PutMapping(value = "/patient/update-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/patient/update-profile")
     public ResponseEntity<?> updateProfile(
-            @RequestPart("patientEditDto") PatientEditDto patientEditDto,
-            @RequestPart("file") MultipartFile file) {
+            @RequestBody PatientEditDto patientEditDto) {
         try {
-            byte[] imageData = file.getBytes();
-            patientEditDto.setPatientImage(imageData);
             String response = patientService.updatePatientInfo(patientEditDto);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {

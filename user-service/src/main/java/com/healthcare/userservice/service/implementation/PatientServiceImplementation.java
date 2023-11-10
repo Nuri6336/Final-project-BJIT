@@ -46,7 +46,6 @@ public class PatientServiceImplementation implements PatientService {
                 .orElseThrow(() -> new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
 
             patientEntity.setAge(patientEditDto.getAge());
-            patientEntity.setPatientImage(patientEditDto.getPatientImage());
             patientEntity.setAddress(patientEditDto.getAddress());
             patientRepository.save(patientEntity);
 
@@ -74,7 +73,6 @@ public class PatientServiceImplementation implements PatientService {
 
         returnDto.setAddress(patientEntity.getAddress());
         returnDto.setAge(patientEntity.getAge());
-        returnDto.setPatientImage(patientEntity.getPatientImage());
 
         returnDto.setUniqueId(userEntity.getUniqueId());
         returnDto.setGender(userEntity.getGender());

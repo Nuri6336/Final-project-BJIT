@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -50,10 +51,10 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         userEntity.setGender(user.getGender());
         userEntity.setMobile(user.getMobile());
 
-        if (user.getRole() == AppConstants.ROLE_PATIENT){
+        if (Objects.equals(user.getRole(), AppConstants.ROLE_PATIENT)){
             String uniqueId = ("PAT" + JWTUtils.generateString(5)).toUpperCase();
             userEntity.setUniqueId(uniqueId);
-        } else if (user.getRole() == AppConstants.ROLE_DOCTOR) {
+        } else if (Objects.equals(user.getRole(), AppConstants.ROLE_DOCTOR)) {
             String uniqueId = ("DOC" + JWTUtils.generateString(5)).toUpperCase();
             userEntity.setUniqueId(uniqueId);
         }else {
