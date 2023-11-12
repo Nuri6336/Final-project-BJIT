@@ -1,15 +1,22 @@
 package com.healthcare.schedulingservice.service.implementation;
 
+import com.healthcare.schedulingservice.constants.AppConstants;
 import com.healthcare.schedulingservice.dto.AppointmentDto;
 import com.healthcare.schedulingservice.dto.ScheduleDto;
+import com.healthcare.schedulingservice.dto.UserDto;
 import com.healthcare.schedulingservice.entity.AppointmentEntity;
 import com.healthcare.schedulingservice.entity.ScheduleEntity;
+import com.healthcare.schedulingservice.exception.NameAlreadyExistsException;
+import com.healthcare.schedulingservice.exception.ValueNotFoundException;
+import com.healthcare.schedulingservice.networkmanager.UserFeingClient;
 import com.healthcare.schedulingservice.repository.AppointmentRepository;
 import com.healthcare.schedulingservice.repository.ScheduleRepository;
 import com.healthcare.schedulingservice.service.ScheduleService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,13 +31,25 @@ public class ScheduleServiceImplementation implements ScheduleService {
     private ScheduleRepository scheduleRepository;
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private UserFeingClient userFeingClient;
+
+    private UserDto getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userMail = authentication.getName();
+        return userFeingClient.userDetailsByEmail(userMail);
+    }
+
+    private String getCurrentUserId() {
+        return getCurrentUser().getUniqueId();
+    }
 
     //As a doctor what to do
     @Override
-    public String addSchedule(ScheduleDto scheduleDto, String doctorId){
+    public String addSchedule(ScheduleDto scheduleDto){
         ScheduleEntity scheduleEntity = new ScheduleEntity();
 
-        scheduleEntity.setDoctorId(doctorId);
+        scheduleEntity.setDoctorId(getCurrentUserId());
         scheduleEntity.setScheduleDate(scheduleDto.getScheduleDate());
         scheduleEntity.setScheduleTime(scheduleDto.getScheduleTime());
         scheduleEntity.setAvailability(true);
@@ -41,10 +60,10 @@ public class ScheduleServiceImplementation implements ScheduleService {
     }
 
     @Override
-    public String editSchedule(Long scheduleId, String doctorId, ScheduleDto scheduleDto) throws Exception {
+    public String editSchedule(Long scheduleId, ScheduleDto scheduleDto) throws ValueNotFoundException {
         ScheduleEntity scheduleEntity = scheduleRepository
-                .findByScheduleIdAndDoctorId(scheduleId, doctorId)
-                .orElseThrow(() -> new Exception("No value found."));
+                .findByScheduleIdAndDoctorId(scheduleId, getCurrentUserId())
+                .orElseThrow(() -> new ValueNotFoundException(AppConstants.USER_NOT_FOUND));
 
         scheduleEntity.setScheduleDate(scheduleDto.getScheduleDate());
         scheduleEntity.setScheduleTime(scheduleDto.getScheduleTime());
@@ -56,10 +75,10 @@ public class ScheduleServiceImplementation implements ScheduleService {
     }
 
     @Override
-    public String deleteSchedule(Long scheduleId, String doctorId, ScheduleDto scheduleDto) throws Exception {
+    public String deleteSchedule(Long scheduleId, ScheduleDto scheduleDto) throws ValueNotFoundException {
         ScheduleEntity scheduleEntity = scheduleRepository
-                .findByScheduleIdAndDoctorId(scheduleId, doctorId)
-                .orElseThrow(() -> new Exception("No value found."));
+                .findByScheduleIdAndDoctorId(scheduleId, getCurrentUserId())
+                .orElseThrow(() -> new ValueNotFoundException(AppConstants.USER_NOT_FOUND));
 
         scheduleRepository.delete(scheduleEntity);
 
@@ -67,10 +86,10 @@ public class ScheduleServiceImplementation implements ScheduleService {
     }
 
     @Override
-    public String changStatus(Long appointmentId, String doctorId) throws Exception {
+    public String changStatus(Long appointmentId) throws ValueNotFoundException {
         AppointmentEntity appointmentEntity = appointmentRepository
-                .findByAppointmentIdAndDoctorId(appointmentId, doctorId)
-                .orElseThrow(() -> new Exception("No value found."));
+                .findByAppointmentIdAndDoctorId(appointmentId, getCurrentUserId())
+                .orElseThrow(() -> new ValueNotFoundException(AppConstants.USER_NOT_FOUND));
 
         appointmentEntity.setStatus("Done");
 
@@ -78,14 +97,14 @@ public class ScheduleServiceImplementation implements ScheduleService {
     }
 
     @Override
-    public List<AppointmentDto> doctorViewAppointment(String doctorId){
+    public List<AppointmentDto> doctorViewAppointment(){
         List<AppointmentEntity> appointmentEntities = appointmentRepository
-                .findByDoctorId(doctorId);
+                .findByDoctorId(getCurrentUserId());
 
         List<AppointmentDto> appointmentDtos = new ArrayList<>();
 
-        for (AppointmentEntity healthDataEntity1: appointmentEntities) {
-            appointmentDtos.add(new ModelMapper().map(healthDataEntity1, AppointmentDto.class));
+        for (AppointmentEntity appointmentEntity: appointmentEntities) {
+            appointmentDtos.add(new ModelMapper().map(appointmentEntity, AppointmentDto.class));
         }
 
         return appointmentDtos;
@@ -93,33 +112,35 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
     //As a patient what to do
     @Override
-    public String bookAppointment(Long scheduleId, String patientId) throws Exception {
+    public String bookAppointment(Long scheduleId) throws NameAlreadyExistsException,ValueNotFoundException {
         Optional<ScheduleEntity> scheduleEntity = scheduleRepository
-                .findByScheduleIdAndAvailability(scheduleId, true);
+                .findByScheduleIdAndAvailability(scheduleId, false);
 
         if (scheduleEntity.isPresent()){
-            throw new Exception("Already booked");
+            throw new NameAlreadyExistsException("Already booked by another patient.");
         }
 
         ScheduleEntity scheduleEntity1 = scheduleRepository
                 .findById(scheduleId)
-                .orElseThrow(() -> new Exception());
+                .orElseThrow(() -> new ValueNotFoundException("Use valid id to book appointment"));
+
+        scheduleEntity1.setAvailability(false);
 
         AppointmentEntity appointment = new AppointmentEntity();
         appointment.setStatus("Booked");
         appointment.setScheduleEntity(scheduleEntity1);
         appointment.setDoctorId(scheduleEntity1.getDoctorId());
-        appointment.setPatientId(patientId);
+        appointment.setPatientId(getCurrentUserId());
 
         appointmentRepository.save(appointment);
 
-        return "Appointment booked for patientId " + patientId;
+        return "Appointment booked for patientId " + getCurrentUserId();
     }
 
     @Override
-    public List<AppointmentDto> patientViewAppointment(String patientId){
+    public List<AppointmentDto> patientViewAppointment(){
         List<AppointmentEntity> appointmentEntities = appointmentRepository
-                .findByPatientId(patientId);
+                .findByPatientId(getCurrentUserId());
 
         List<AppointmentDto> appointmentDtos = new ArrayList<>();
 
@@ -132,9 +153,23 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
     //Common things to do
     @Override
-    public List<ScheduleDto> viewSchedule(String doctorId){
+    public List<ScheduleDto> viewAvailableSchedule(String doctorId){
         List<ScheduleEntity> scheduleEntity = scheduleRepository
                 .findByDoctorIdAndAvailability(doctorId, true);
+
+        List<ScheduleDto> scheduleDtos = new ArrayList<>();
+
+        for (ScheduleEntity scheduleEntity1: scheduleEntity) {
+            scheduleDtos.add(new ModelMapper().map(scheduleEntity1, ScheduleDto.class));
+        }
+
+        return scheduleDtos;
+    }
+
+    @Override
+    public List<ScheduleDto> viewSchedule(String doctorId){
+        List<ScheduleEntity> scheduleEntity = scheduleRepository
+                .findByDoctorId(doctorId);
 
         List<ScheduleDto> scheduleDtos = new ArrayList<>();
 

@@ -11,4 +11,5 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Long> 
     Optional<ScheduleEntity> findByScheduleIdAndDoctorId(Long scheduleId, String doctorId);
     Optional<ScheduleEntity> findByScheduleIdAndAvailability(Long scheduleId, boolean availability);
     List<ScheduleEntity> findByDoctorIdAndAvailability(String doctorId, boolean availability);
+    List<ScheduleEntity> findByDoctorId(String doctorId);
 }

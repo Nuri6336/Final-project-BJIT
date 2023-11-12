@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @Builder
 public class ScheduleDto {
 
-    private Long id;
+    private Long scheduleId;
     private String doctorId;
     private LocalDate scheduleDate;
     private LocalTime scheduleTime;
