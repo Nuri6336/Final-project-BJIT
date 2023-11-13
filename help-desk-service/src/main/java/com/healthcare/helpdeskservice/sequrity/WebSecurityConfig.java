@@ -41,6 +41,10 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.GET,"/help-desk/resource/view-all-resource").permitAll()
                             .requestMatchers(HttpMethod.POST,"/help-desk/resource/allocate/{doctorId}").hasAuthority(AppConstants.ROLE_ADMIN)
                             .requestMatchers(HttpMethod.GET,"/help-desk/resource/cancel-allocation/{resourceAllocationId}").hasAuthority(AppConstants.ROLE_ADMIN)
+                            .requestMatchers(HttpMethod.GET,"/help-desk/faq/all").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/help-desk/faq/individual/{id}").permitAll()
+                            .requestMatchers(HttpMethod.POST,"/help-desk/faq/create").hasAuthority(AppConstants.ROLE_ADMIN)
+                            .requestMatchers(HttpMethod.DELETE,"/help-desk/faq/delete/{id}").hasAuthority(AppConstants.ROLE_ADMIN)
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
