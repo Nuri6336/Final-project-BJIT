@@ -34,6 +34,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth->{
                     auth
                             .requestMatchers(HttpMethod.POST, AppConstants.SIGN_IN,AppConstants.SIGN_UP).permitAll()
+                            .requestMatchers(HttpMethod.GET, "/users/register/doctor").hasAuthority(AppConstants.ROLE_ADMIN)
                             .requestMatchers(HttpMethod.GET, "/users/doctor/profile").permitAll()
                             .requestMatchers(HttpMethod.PUT, "/users/doctor/update-profile").hasAuthority(AppConstants.ROLE_DOCTOR)
                             .requestMatchers(HttpMethod.PUT, "/users/patient/update-profile").hasAuthority(AppConstants.ROLE_PATIENT)

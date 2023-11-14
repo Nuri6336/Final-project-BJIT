@@ -23,7 +23,10 @@ public class PatientHealthGoalEntity {
     private String patientId;
     private String goalName;
     private String goalDescription;
+    private double targetValue;
+    private double goalValue;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String goalStatus;
+    private String updateMessage;
 }

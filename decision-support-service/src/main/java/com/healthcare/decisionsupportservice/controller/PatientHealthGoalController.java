@@ -1,8 +1,10 @@
 package com.healthcare.decisionsupportservice.controller;
 
 import com.healthcare.decisionsupportservice.dto.ExternalDataDto;
+import com.healthcare.decisionsupportservice.dto.PatientHealthGoalDto;
 import com.healthcare.decisionsupportservice.entity.PatientHealthGoalEntity;
 import com.healthcare.decisionsupportservice.entity.ProgressData;
+import com.healthcare.decisionsupportservice.exception.ValueNotFoundException;
 import com.healthcare.decisionsupportservice.service.PatientHealthGoalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,8 @@ public class PatientHealthGoalController {
     private PatientHealthGoalService patientHealthGoalService;
 
     @PostMapping("/goal/create")
-    public ResponseEntity<PatientHealthGoalEntity> createHealthGoal(@RequestBody PatientHealthGoalEntity healthGoal) {
-        PatientHealthGoalEntity createdGoal = patientHealthGoalService.createHealthGoal(healthGoal);
+    public ResponseEntity<PatientHealthGoalEntity> createHealthGoal(@RequestBody PatientHealthGoalDto patientHealthGoalDto) {
+        PatientHealthGoalEntity createdGoal = patientHealthGoalService.createHealthGoal(patientHealthGoalDto);
         return ResponseEntity.ok(createdGoal);
     }
 
@@ -29,10 +31,10 @@ public class PatientHealthGoalController {
         return ResponseEntity.ok(healthGoals);
     }
 
-    @PutMapping("/goal/update-progress/{goalId}")
+    @PutMapping("/goal/update-progress/{goalId}/{goalValue}")
     public ResponseEntity<PatientHealthGoalEntity> updateHealthGoalProgress(
-            @PathVariable Long goalId, @RequestBody String progressUpdate) {
-        PatientHealthGoalEntity updatedGoal = patientHealthGoalService.updateHealthGoalProgress(goalId, progressUpdate);
+            @PathVariable Long goalId, @PathVariable double goalValue) throws ValueNotFoundException {
+        PatientHealthGoalEntity updatedGoal = patientHealthGoalService.updateHealthGoalProgress(goalId, goalValue);
         return ResponseEntity.ok(updatedGoal);
     }
 

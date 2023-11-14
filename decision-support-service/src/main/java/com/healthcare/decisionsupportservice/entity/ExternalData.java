@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "progress_data")
+@Table(name = "external_data")
 public class ExternalData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long externalGoalId;
+
     private String patientId;
     private double externalProgress;
     private LocalDateTime externalUpdateTime;

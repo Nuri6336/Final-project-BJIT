@@ -51,15 +51,24 @@ public class UserController {
         try {
             UserDto returnValue = userServiceImplementation.createUser(userDto);
 
-            if (returnValue.getRole().equals(AppConstants.ROLE_PATIENT)){
-                PatientEntity patientEntity = new PatientEntity();
-                patientEntity.setPatientUniqueId(returnValue.getUniqueId());
-                patientRepository.save(patientEntity);
-            } else if (returnValue.getRole().equals(AppConstants.ROLE_DOCTOR)) {
-                DoctorEntity doctorEntity = new DoctorEntity();
-                doctorEntity.setDoctorUniqueID(returnValue.getUniqueId());
-                doctorRepository.save(doctorEntity);
-            }
+            PatientEntity patientEntity = new PatientEntity();
+            patientEntity.setPatientUniqueId(returnValue.getUniqueId());
+            patientRepository.save(patientEntity);
+
+            return new ResponseEntity<>("User created successfully!", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/users/register/doctor")
+    public ResponseEntity<?> registerDoctor (@RequestBody UserDto userDto) {
+        try {
+            UserDto returnValue = userServiceImplementation.createDoctor(userDto);
+
+            DoctorEntity doctorEntity = new DoctorEntity();
+            doctorEntity.setDoctorUniqueID(returnValue.getUniqueId());
+            doctorRepository.save(doctorEntity);
 
             return new ResponseEntity<>("User created successfully!", HttpStatus.CREATED);
         } catch (Exception e) {

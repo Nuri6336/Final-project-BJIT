@@ -51,15 +51,10 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         userEntity.setGender(user.getGender());
         userEntity.setMobile(user.getMobile());
 
-        if (Objects.equals(user.getRole(), AppConstants.ROLE_PATIENT)){
-            String uniqueId = ("PAT" + JWTUtils.generateString(5)).toUpperCase();
-            userEntity.setUniqueId(uniqueId);
-        } else if (Objects.equals(user.getRole(), AppConstants.ROLE_DOCTOR)) {
-            String uniqueId = ("DOC" + JWTUtils.generateString(5)).toUpperCase();
-            userEntity.setUniqueId(uniqueId);
-        }
+        String uniqueId = ("PAT" + JWTUtils.generateString(5)).toUpperCase();
+        userEntity.setUniqueId(uniqueId);
 
-        userEntity.setRole(user.getRole());
+        userEntity.setRole("PATIENT");
         userEntity.setDateOfRegistration(LocalDateTime.now());
 
         String recipientEmail = user.getEmail();
@@ -134,5 +129,50 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         userEntity.setMobile(userDto.getMobile());
 
         userRepository.save(userEntity);
+    }
+
+    //For doctor registration
+    public UserDto createDoctor(UserDto user) throws Exception {
+        if(userRepository.findByEmail(user.getEmail()).isPresent())
+            throw new Exception("Email already exists!");
+        UserEntity userEntity = new UserEntity();
+
+        userEntity.setFname(user.getFname());
+        userEntity.setLname(user.getLname());
+        userEntity.setEmail(user.getEmail());
+        userEntity.setGender(user.getGender());
+        userEntity.setMobile(user.getMobile());
+
+        String uniqueId = ("DOC" + JWTUtils.generateString(5)).toUpperCase();
+        userEntity.setUniqueId(uniqueId);
+
+        userEntity.setRole("DOCTOR");
+        userEntity.setDateOfRegistration(LocalDateTime.now());
+
+        String recipientEmail = user.getEmail();
+        String randomPassword = JWTUtils.generateString(12);
+
+        if (user.getPassword() != null){
+            userEntity.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }else {
+            String emailSubject = "Patient login password";
+            String emailText = "Welcome to Healthcare ,\n" +
+                    "\n" +
+                    "Your registration process with " + recipientEmail + " is successfully completed, and your password is "+ randomPassword +"\n" +
+                    "\n" +
+                    "Thank you.";
+            emailService.sendEmail(recipientEmail, emailSubject, emailText);
+            userEntity.setPassword(bCryptPasswordEncoder.encode(randomPassword));
+        }
+
+        UserEntity storedUserDetails = userRepository.save(userEntity);
+        UserDto returnedValue = new ModelMapper().map(storedUserDetails,UserDto.class);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(user.getRole());
+
+        String accessToken = JWTUtils.generateToken(userEntity.getEmail(), userRoles);
+        returnedValue.setAccessToken(AppConstants.TOKEN_PREFIX + accessToken);
+        return returnedValue;
     }
 }

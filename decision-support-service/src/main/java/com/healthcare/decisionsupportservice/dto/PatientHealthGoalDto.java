@@ -13,12 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class PatientHealthGoalDto {
 
-    private Long goalId;
-    private String patientId;
     private String goalName;
     private String goalDescription;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private String goalStatus;
+    private double targetValue;
 }
 

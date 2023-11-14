@@ -1,18 +1,20 @@
 package com.healthcare.decisionsupportservice.service;
 
 import com.healthcare.decisionsupportservice.dto.ExternalDataDto;
+import com.healthcare.decisionsupportservice.dto.PatientHealthGoalDto;
 import com.healthcare.decisionsupportservice.entity.PatientHealthGoalEntity;
 import com.healthcare.decisionsupportservice.entity.ProgressData;
+import com.healthcare.decisionsupportservice.exception.ValueNotFoundException;
 
 import java.util.List;
 
 public interface PatientHealthGoalService {
 
-    PatientHealthGoalEntity createHealthGoal(PatientHealthGoalEntity healthGoal);
+    PatientHealthGoalEntity createHealthGoal(PatientHealthGoalDto patientHealthGoalDto);
 
     List<PatientHealthGoalEntity> getHealthGoalsByPatientId(String patientId);
 
-    PatientHealthGoalEntity updateHealthGoalProgress(Long goalId, String progressUpdate);
+    PatientHealthGoalEntity updateHealthGoalProgress(Long goalId, double updateValue) throws ValueNotFoundException;
 
     void deleteHealthGoal(Long goalId);
 

@@ -18,9 +18,9 @@ public class ProgressData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long progress_id;
+    private Long progressId;
 
     private Long goalId;
-    private double update;
+    private double updateValue;
     private LocalDateTime timestamp;
 }

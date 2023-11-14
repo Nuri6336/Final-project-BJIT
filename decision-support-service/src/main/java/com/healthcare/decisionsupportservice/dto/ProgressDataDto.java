@@ -15,6 +15,6 @@ public class ProgressDataDto {
 
     private Long progress_id;
     private Long goalId;
-    private double update;
+    private double updateValue;
     private LocalDateTime timestamp;
 }
