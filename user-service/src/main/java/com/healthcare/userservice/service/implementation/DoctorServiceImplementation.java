@@ -1,6 +1,7 @@
 package com.healthcare.userservice.service.implementation;
 
 import com.healthcare.userservice.constants.AppConstants;
+import com.healthcare.userservice.dto.DoctorAllocationDto;
 import com.healthcare.userservice.dto.DoctorDto;
 import com.healthcare.userservice.dto.DoctorProfileDto;
 import com.healthcare.userservice.entity.DoctorEntity;
@@ -36,7 +37,6 @@ public class DoctorServiceImplementation implements DoctorService {
         doctorEntity.setQualifications(doctorDto.getQualifications());
         doctorEntity.setSpecialities(doctorDto.getSpecialities());
         doctorEntity.setAddress(doctorDto.getAddress());
-        doctorEntity.setRoomNo(doctorDto.getRoomNo());
 
         return "Updated successfully";
     }
@@ -81,5 +81,24 @@ public class DoctorServiceImplementation implements DoctorService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new Exception(AppConstants.TOKEN_INVALID));
+    }
+
+    @Override
+    public String addOrUpdateRoomAllocation(String doctorId, DoctorAllocationDto doctorAllocationDto) {
+        DoctorEntity doctorEntity = doctorRepository.findByDoctorUniqueID(doctorId)
+                .orElseThrow(() -> new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
+
+        // Update only the specified fields
+        if (doctorAllocationDto.getRoomNo() != null) {
+            doctorEntity.setRoomNo(doctorAllocationDto.getRoomNo());
+        }
+
+        if (doctorAllocationDto.getDutySlot() != null) {
+            doctorEntity.setDutySlot(doctorAllocationDto.getDutySlot());
+        }
+
+        // Save the updated entity
+        doctorRepository.save(doctorEntity);
+        return "Successfully stored";
     }
 }

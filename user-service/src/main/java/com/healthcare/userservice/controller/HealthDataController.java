@@ -5,6 +5,7 @@ import com.healthcare.userservice.service.implementation.HealthDataServiceImplem
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,10 @@ public class HealthDataController {
     @Autowired
     private HealthDataServiceImplementation healthDataServiceImplementation;
 
-    @PostMapping("/users/add/healthdata")
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @PostMapping("/users/add/health-data")
     public ResponseEntity<?> createHealthData (@RequestBody HealthDataDto healthDataDto) {
         try {
             healthDataServiceImplementation.createHealthData(healthDataDto);
@@ -25,7 +29,7 @@ public class HealthDataController {
         }
     }
 
-    @GetMapping("/users/healthdata")
+    @GetMapping("/users/health-data")
     public ResponseEntity<?> getHealthData () {
         try {
             HealthDataDto healthDataDto = healthDataServiceImplementation.getHealthData();
@@ -35,7 +39,7 @@ public class HealthDataController {
         }
     }
 
-    @GetMapping("/users/healthdata/{userId}")
+    @GetMapping("/users/health-data/{userId}")
     public ResponseEntity<?> getAllHealthDataById (@PathVariable Long userId) {
         try {
             List<HealthDataDto> healthDataDto = healthDataServiceImplementation.getAllHealthDataById(userId);
@@ -45,7 +49,7 @@ public class HealthDataController {
         }
     }
 
-    @GetMapping("/users/healthdata/all")
+    @GetMapping("/users/health-data/all")
     public ResponseEntity<?> getAllHealthData () {
         try {
             List <HealthDataDto> allHealthData = healthDataServiceImplementation.getAllHealthData();

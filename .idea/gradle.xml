@@ -6,7 +6,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/api-gateway" />
-        <option name="gradleHome" value="D:/SOETWARE/Training purpose/gradle-8.3" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -16,6 +16,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/community-service" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -25,6 +26,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/config-server" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -34,6 +36,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/decision-support-service" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -43,6 +46,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/help-desk-service" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -52,6 +56,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/notification-service" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -61,6 +66,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/pharmacy-service" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -70,7 +76,6 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/scheduling-service" />
-        <option name="gradleHome" value="D:/SOETWARE/Training purpose/gradle-8.3" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -80,6 +85,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/service-discovery" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -89,6 +95,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/user-service" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../Program Files/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>

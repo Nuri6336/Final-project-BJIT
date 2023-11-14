@@ -1,9 +1,7 @@
 package com.healthcare.userservice.controller;
 
+import com.healthcare.userservice.dto.DoctorAllocationDto;
 import com.healthcare.userservice.dto.DoctorDto;
-import com.healthcare.userservice.dto.DoctorProfileDto;
-import com.healthcare.userservice.dto.PatientEditDto;
-import com.healthcare.userservice.dto.PatientProfileDto;
 import com.healthcare.userservice.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
-public class DoctorController {
+public class AdminController {
 
     @Autowired
     private DoctorService doctorService;
@@ -21,25 +19,14 @@ public class DoctorController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @PutMapping("/doctor/update-profile")
-    public ResponseEntity<?> updateProfile(
-            @RequestBody DoctorDto doctorDto) {
+    @PutMapping("/doctor/update-allocation/{doctorId}")
+    public ResponseEntity<?> updateAllocatedRoom(@PathVariable String doctorId,
+            @RequestBody DoctorAllocationDto doctorAllocationDto) {
         try {
-            String response = doctorService.updateDoctorInfo(doctorDto);
+            String response = doctorService.addOrUpdateRoomAllocation(doctorId, doctorAllocationDto);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-    @GetMapping("/doctor/profile")
-    public ResponseEntity<?> viewProfile () {
-        try {
-            DoctorProfileDto doctorProfileDto = doctorService.viewProfile();
-            return new ResponseEntity<>(doctorProfileDto, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 }

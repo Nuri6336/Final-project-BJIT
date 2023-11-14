@@ -17,5 +17,4 @@ public class DoctorDto {
     private String[] qualifications;
     private String[] specialities;
     private String doctorImage;
-    private String roomNo;
 }

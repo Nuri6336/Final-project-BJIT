@@ -34,11 +34,22 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth->{
                     auth
                             .requestMatchers(HttpMethod.POST, AppConstants.SIGN_IN,AppConstants.SIGN_UP).permitAll()
+                            .requestMatchers(HttpMethod.GET, "/users/doctor/profile").permitAll()
+                            .requestMatchers(HttpMethod.PUT, "/users/doctor/update-profile").hasAuthority(AppConstants.ROLE_DOCTOR)
+                            .requestMatchers(HttpMethod.PUT, "/users/patient/update-profile").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET, "/users/patient/profile").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.POST, "/users/add/health-data").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET, "/users/health-data").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET, "/users/health-data/{userId}").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET, "/users/health-data/all").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.POST, "/users/fileSystem").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.POST, "/users/fileSystem/doctor").hasAuthority(AppConstants.ROLE_DOCTOR)
+                            .requestMatchers(HttpMethod.GET, "/users/fileSystem/{id}").permitAll()
+                            .requestMatchers(HttpMethod.DELETE, "/users/fileSystem/delete/{id}").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.DELETE, "/users/fileSystem/doctor/delete/{id}").hasAuthority(AppConstants.ROLE_DOCTOR)
+                            .requestMatchers(HttpMethod.PUT, "/users/doctor/update-allocation/{doctorId}").hasAuthority(AppConstants.ROLE_ADMIN)
                             .anyRequest().authenticated();
-
-
                 })
-                .addFilter(new CustomAuthenticationFilter(authenticationManager))
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
         return http.build();

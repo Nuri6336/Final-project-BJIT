@@ -26,4 +26,5 @@ public class DoctorEntity {
     private String[] qualifications;
     private String[] specialities;
     private String roomNo;
+    private String dutySlot;
 }
