@@ -1,6 +1,7 @@
 package com.healthcare.pharmacyservice.service;
 
 import com.healthcare.pharmacyservice.dto.PharmacyDto;
+import com.healthcare.pharmacyservice.entity.PharmacyEntity;
 import com.healthcare.pharmacyservice.exception.ValueNotFoundException;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface PharmacyService {
     String deleteMedicine(Long medicineId) throws ValueNotFoundException;
     List<PharmacyDto> viewAllMedicine();
     PharmacyDto viewIndividualMedicine(Long medicineId) throws ValueNotFoundException;
+    List<PharmacyDto> findMedicinesNotExpired();
+    List<PharmacyDto> findAndSetExpiredMedicines();
 }

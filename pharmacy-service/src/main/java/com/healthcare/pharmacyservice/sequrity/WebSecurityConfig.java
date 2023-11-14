@@ -39,6 +39,8 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.DELETE,"/pharmacy/delete/{medicineId}").hasAuthority(AppConstants.ROLE_ADMIN)
                             .requestMatchers(HttpMethod.GET,"/pharmacy/view-individual-medicine/{medicineId}").permitAll()
                             .requestMatchers(HttpMethod.GET,"/pharmacy/view-all-medicine").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/pharmacy/view-all-medicine/below-expire-date").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/pharmacy/expired-medicines").hasAuthority(AppConstants.ROLE_ADMIN)
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)

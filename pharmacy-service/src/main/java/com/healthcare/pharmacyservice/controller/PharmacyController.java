@@ -65,4 +65,18 @@ public class PharmacyController {
         }
     }
 
+    @GetMapping("/pharmacy/view-all-medicine/below-expire-date")
+    public ResponseEntity<?> viewAllMedicineWithValid () {
+        try {
+            List<PharmacyDto> pharmacyDtos = pharmacyService.findMedicinesNotExpired();
+            return new ResponseEntity<>(pharmacyDtos, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/pharmacy/expired-medicines")
+    public List<PharmacyDto> findAndSetExpiredMedicines() {
+        return pharmacyService.findAndSetExpiredMedicines();
+    }
 }

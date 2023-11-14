@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,5 +83,38 @@ public class PharmacyServiceImplementation implements PharmacyService {
                 .orElseThrow(() -> new ValueNotFoundException("No medicine found."));
 
         return (new ModelMapper().map(pharmacyEntity, PharmacyDto.class));
+    }
+
+    @Override
+    public List<PharmacyDto> findMedicinesNotExpired() {
+        LocalDate currentDate = LocalDate.now();
+        List<PharmacyEntity> pharmacyEntities = pharmacyRepository.findByExpireDateGreaterThan(currentDate);
+
+        List<PharmacyDto> pharmacyDtos = new ArrayList<>();
+
+        for (PharmacyEntity pharmacyEntity: pharmacyEntities) {
+            pharmacyDtos.add(new ModelMapper().map(pharmacyEntity, PharmacyDto.class));
+        }
+
+        return pharmacyDtos;
+    }
+
+    @Override
+    public List<PharmacyDto> findAndSetExpiredMedicines() {
+        LocalDate currentDate = LocalDate.now();
+        List<PharmacyEntity> pharmacyEntities = pharmacyRepository.findByExpireDateLessThan(currentDate);
+
+        List<PharmacyDto> pharmacyDtos = new ArrayList<>();
+
+        for (PharmacyEntity pharmacyEntity : pharmacyEntities) {
+            // Set the status to "Stock Out" for expired medicines
+            pharmacyEntity.setStatus("Stock Out");
+            pharmacyRepository.save(pharmacyEntity); // Save the updated entity
+
+            // Map the updated entity to a DTO
+            pharmacyDtos.add(new ModelMapper().map(pharmacyEntity, PharmacyDto.class));
+        }
+
+        return pharmacyDtos;
     }
 }
