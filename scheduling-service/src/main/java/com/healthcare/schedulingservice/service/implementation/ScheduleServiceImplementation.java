@@ -1,17 +1,19 @@
 package com.healthcare.schedulingservice.service.implementation;
 
 import com.healthcare.schedulingservice.constants.AppConstants;
-import com.healthcare.schedulingservice.dto.AppointmentDto;
-import com.healthcare.schedulingservice.dto.ScheduleDto;
-import com.healthcare.schedulingservice.dto.UserDto;
+import com.healthcare.schedulingservice.dto.*;
 import com.healthcare.schedulingservice.entity.AppointmentEntity;
 import com.healthcare.schedulingservice.entity.ScheduleEntity;
+import com.healthcare.schedulingservice.entity.ShiftEntity;
 import com.healthcare.schedulingservice.exception.NameAlreadyExistsException;
 import com.healthcare.schedulingservice.exception.ValueNotFoundException;
+import com.healthcare.schedulingservice.networkmanager.NotificationFeingClient;
 import com.healthcare.schedulingservice.networkmanager.UserFeingClient;
 import com.healthcare.schedulingservice.repository.AppointmentRepository;
 import com.healthcare.schedulingservice.repository.ScheduleRepository;
+import com.healthcare.schedulingservice.repository.ShiftRepository;
 import com.healthcare.schedulingservice.service.ScheduleService;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,10 @@ public class ScheduleServiceImplementation implements ScheduleService {
     private AppointmentRepository appointmentRepository;
     @Autowired
     private UserFeingClient userFeingClient;
+    @Autowired
+    private NotificationFeingClient notificationFeingClient;
+    @Autowired
+    private ShiftRepository shiftRepository;
 
     private UserDto getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -134,6 +141,18 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
         appointmentRepository.save(appointment);
 
+        NotificationDto notificationRequest = new NotificationDto();
+        notificationRequest.setMessage("Appointment booked for patientId " + getCurrentUserId());
+        notificationRequest.setNotificationType("Appointment");
+        notificationRequest.setStatus("UNREAD");
+        notificationRequest.setRecipientId(scheduleEntity1.getDoctorId());
+
+        try {
+            notificationFeingClient.sendNotification(notificationRequest);
+        } catch (FeignException e) {
+            return "Feign client exception " + e.getMessage();
+        }
+
         return "Appointment booked for patientId " + getCurrentUserId();
     }
 
@@ -153,30 +172,76 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
     //Common things to do
     @Override
-    public List<ScheduleDto> viewAvailableSchedule(String doctorId){
+    public List<ResponseScheduleDto> viewAvailableSchedule(String doctorId){
         List<ScheduleEntity> scheduleEntity = scheduleRepository
                 .findByDoctorIdAndAvailability(doctorId, true);
 
-        List<ScheduleDto> scheduleDtos = new ArrayList<>();
+        List<ResponseScheduleDto> scheduleDtos = new ArrayList<>();
 
         for (ScheduleEntity scheduleEntity1: scheduleEntity) {
-            scheduleDtos.add(new ModelMapper().map(scheduleEntity1, ScheduleDto.class));
+            scheduleDtos.add(new ModelMapper().map(scheduleEntity1, ResponseScheduleDto.class));
         }
 
         return scheduleDtos;
     }
 
     @Override
-    public List<ScheduleDto> viewSchedule(String doctorId){
+    public List<ResponseScheduleDto> viewSchedule(String doctorId){
         List<ScheduleEntity> scheduleEntity = scheduleRepository
                 .findByDoctorId(doctorId);
 
-        List<ScheduleDto> scheduleDtos = new ArrayList<>();
+        List<ResponseScheduleDto> scheduleDtos = new ArrayList<>();
 
         for (ScheduleEntity scheduleEntity1: scheduleEntity) {
-            scheduleDtos.add(new ModelMapper().map(scheduleEntity1, ScheduleDto.class));
+            scheduleDtos.add(new ModelMapper().map(scheduleEntity1, ResponseScheduleDto.class));
         }
 
         return scheduleDtos;
     }
+
+    //Schedule with shift
+    @Override
+    public String addScheduleWithShift(ScheduleDto scheduleDto) throws ValueNotFoundException, NameAlreadyExistsException {
+        String doctorId = getCurrentUserId();
+        LocalDateTime scheduleDateTime = LocalDateTime.of(scheduleDto.getScheduleDate(), scheduleDto.getScheduleTime());
+
+        ShiftEntity shift = shiftRepository.findById(scheduleDto.getShiftId())
+                .orElseThrow(() -> new ValueNotFoundException("Shift not found"));
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        if (scheduleDateTime.isBefore(currentDateTime)) {
+            throw new IllegalArgumentException("Schedule time cannot be in the past");
+        }
+
+        List<ScheduleEntity> scheduleEntries = new ArrayList<>();
+
+        // Assuming 30 minutes duration for each schedule entry
+        while (scheduleDateTime.isBefore(scheduleDto.getScheduleDate().atTime(shift.getEndTime()))) {
+            ScheduleEntity scheduleEntity = new ScheduleEntity();
+            scheduleEntity.setDoctorId(doctorId);
+            scheduleEntity.setShiftId(shift);
+            scheduleEntity.setScheduleDate(scheduleDateTime.toLocalDate());
+            scheduleEntity.setScheduleTime(scheduleDateTime.toLocalTime());
+            scheduleEntity.setAvailability(true);
+
+            scheduleEntries.add(scheduleEntity);
+
+            // Move to the next schedule time
+            scheduleDateTime = scheduleDateTime.plusMinutes(30); // Adjust duration as needed
+        }
+
+        for (ScheduleEntity scheduleEntry : scheduleEntries) {
+            List<ScheduleEntity> existingSchedules = scheduleRepository.findByDoctorIdAndShiftIdAndScheduleDate(
+                    doctorId, shift, scheduleEntry.getScheduleDate());
+
+            if (!existingSchedules.isEmpty()) {
+                throw new NameAlreadyExistsException("You already booked this time.");
+            }
+        }
+
+        scheduleRepository.saveAll(scheduleEntries);
+
+        return "Schedules added to the database.";
+    }
+
 }

@@ -42,6 +42,13 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.GET,"/decision-support/goal/progress-data/{goalId}").hasAuthority(AppConstants.ROLE_PATIENT)
                             .requestMatchers(HttpMethod.POST,"/decision-support/goal/send-notification/{patientId}").hasAuthority(AppConstants.ROLE_ADMIN)
                             .requestMatchers(HttpMethod.POST,"/decision-support/goal/update-external-progress/{patientId}").hasAuthority(AppConstants.ROLE_PATIENT)
+
+                            .requestMatchers(HttpMethod.POST,"/decision-support/mental-health/exercises").hasAuthority(AppConstants.ROLE_ADMIN)
+                            .requestMatchers(HttpMethod.POST,"/decision-support/mental-health/mood-tracking").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET,"/decision-support/mental-health/exercises").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET,"/decision-support/mood-tracking").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET,"/decision-support/mental-health/mood-tracking/last").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.GET,"/decision-support/mental-health/recommendations").hasAuthority(AppConstants.ROLE_PATIENT)
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)

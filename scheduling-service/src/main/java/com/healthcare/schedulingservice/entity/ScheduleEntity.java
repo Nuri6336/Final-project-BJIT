@@ -11,14 +11,16 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Getter
-@Setter
 @Table(name="doctor_schedule")
 public class ScheduleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scheduleId;
+
+    @ManyToOne
+    @JoinColumn(name = "shift_id")
+    private ShiftEntity shiftId;
 
     private String doctorId;
     private LocalDate scheduleDate;

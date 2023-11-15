@@ -39,7 +39,7 @@ public class NotificationServiceImplementation implements NotificationService {
 
     @Override
     public List<NotificationDto> getUnreadNotifications(String recipientId) {
-        List<NotificationEntity> unreadEntities = notificationRepository.findUnreadNotifications(recipientId);
+        List<NotificationEntity> unreadEntities = notificationRepository.findByRecipientIdAndStatus(recipientId,"UNREAD");
         return mapEntitiesToDtos(unreadEntities);
     }
 
@@ -71,7 +71,6 @@ public class NotificationServiceImplementation implements NotificationService {
         }
 
         NotificationDto dto = new NotificationDto();
-        dto.setNotificationId(entity.getNotificationId());
         dto.setRecipientId(entity.getRecipientId());
         dto.setMessage(entity.getMessage());
         dto.setNotificationType(entity.getNotificationType());

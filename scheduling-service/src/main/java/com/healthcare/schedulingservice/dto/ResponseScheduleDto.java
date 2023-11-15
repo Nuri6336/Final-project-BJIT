@@ -1,5 +1,8 @@
 package com.healthcare.schedulingservice.dto;
 
+import com.healthcare.schedulingservice.entity.ShiftEntity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +15,10 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleDto {
+public class ResponseScheduleDto {
 
     private Long scheduleId;
-    private Long shiftId;
+    private ShiftEntity shiftId;
     private String doctorId;
     private LocalDate scheduleDate;
     private LocalTime scheduleTime;

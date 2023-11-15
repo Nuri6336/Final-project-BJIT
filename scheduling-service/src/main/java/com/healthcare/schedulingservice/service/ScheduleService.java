@@ -1,6 +1,7 @@
 package com.healthcare.schedulingservice.service;
 
 import com.healthcare.schedulingservice.dto.AppointmentDto;
+import com.healthcare.schedulingservice.dto.ResponseScheduleDto;
 import com.healthcare.schedulingservice.dto.ScheduleDto;
 import com.healthcare.schedulingservice.exception.NameAlreadyExistsException;
 import com.healthcare.schedulingservice.exception.ValueNotFoundException;
@@ -15,14 +16,15 @@ public interface ScheduleService {
     String deleteSchedule(Long scheduleId, ScheduleDto scheduleDto) throws ValueNotFoundException;
     String changStatus(Long appointmentId) throws ValueNotFoundException;
     List<AppointmentDto> doctorViewAppointment();
+    String addScheduleWithShift(ScheduleDto scheduleDto) throws ValueNotFoundException, NameAlreadyExistsException;
 
     //As a patient what to do
     String bookAppointment(Long scheduleId) throws ValueNotFoundException, NameAlreadyExistsException;
     List<AppointmentDto> patientViewAppointment();
 
     //Common things to do
-    List<ScheduleDto> viewAvailableSchedule(String doctorId);
-    List<ScheduleDto> viewSchedule(String doctorId);
+    List<ResponseScheduleDto> viewAvailableSchedule(String doctorId);
+    List<ResponseScheduleDto> viewSchedule(String doctorId);
 
 
 }

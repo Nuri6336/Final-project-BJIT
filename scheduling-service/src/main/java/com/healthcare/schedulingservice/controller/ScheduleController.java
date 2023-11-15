@@ -1,6 +1,7 @@
 package com.healthcare.schedulingservice.controller;
 
 import com.healthcare.schedulingservice.dto.AppointmentDto;
+import com.healthcare.schedulingservice.dto.ResponseScheduleDto;
 import com.healthcare.schedulingservice.dto.ScheduleDto;
 import com.healthcare.schedulingservice.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class ScheduleController {
     @GetMapping("/schedule/view-schedule/{doctorId}")
     public ResponseEntity<?> viewSchedule (@PathVariable String doctorId) {
         try {
-            List<ScheduleDto> scheduleDtos = scheduleService.viewAvailableSchedule(doctorId);
+            List<ResponseScheduleDto> scheduleDtos = scheduleService.viewAvailableSchedule(doctorId);
             return new ResponseEntity<>(scheduleDtos, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -79,8 +80,18 @@ public class ScheduleController {
     @GetMapping("/schedule/view-all-schedule/{doctorId}")
     public ResponseEntity<?> viewAllSchedule (@PathVariable String doctorId) {
         try {
-            List<ScheduleDto> scheduleDtos = scheduleService.viewSchedule(doctorId);
+            List<ResponseScheduleDto> scheduleDtos = scheduleService.viewSchedule(doctorId);
             return new ResponseEntity<>(scheduleDtos, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/schedule/add-with-shift")
+    public ResponseEntity<?> addScheduleWithShift ( @RequestBody ScheduleDto scheduleDto) {
+        try {
+            String response = scheduleService.addScheduleWithShift(scheduleDto);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }

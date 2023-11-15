@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
     List<NotificationEntity> findByRecipientId(String recipientId);
-    List<NotificationEntity> findUnreadNotifications(String recipientId);
+    List<NotificationEntity> findByRecipientIdAndStatus(String recipientId, String status);
 }

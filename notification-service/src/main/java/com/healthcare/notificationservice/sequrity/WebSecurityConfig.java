@@ -1,7 +1,7 @@
-package com.healthcare.schedulingservice.sequrity;
+package com.healthcare.notificationservice.sequrity;
 
 import org.springframework.context.annotation.Bean;
-import com.healthcare.schedulingservice.constants.AppConstants;
+import com.healthcare.notificationservice.constants.AppConstants;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,20 +33,11 @@ public class WebSecurityConfig {
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->{
                     auth
-                            .requestMatchers(HttpMethod.POST,"/schedule/add").hasAuthority(AppConstants.ROLE_DOCTOR)
-                            .requestMatchers(HttpMethod.POST,"/schedule/book-appointment/{scheduleId}").hasAuthority(AppConstants.ROLE_PATIENT)
-                            .requestMatchers(HttpMethod.GET,"/schedule/change-status/{appointmentId}").hasAuthority(AppConstants.ROLE_DOCTOR)
-                            .requestMatchers(HttpMethod.GET,"/schedule/doctor/view-appointment").hasAuthority(AppConstants.ROLE_DOCTOR)
-                            .requestMatchers(HttpMethod.GET,"/schedule/patient/view-appointment").hasAuthority(AppConstants.ROLE_PATIENT)
-                            .requestMatchers(HttpMethod.GET,"/schedule/view-all-schedule/{doctorId}").permitAll()
-                            .requestMatchers(HttpMethod.GET,"/schedule/view-schedule/{doctorId}").permitAll()
-                            .requestMatchers(HttpMethod.GET,"/schedule/add-with-shift").hasAuthority(AppConstants.ROLE_DOCTOR)
 
-                            .requestMatchers(HttpMethod.POST,"/schedule/shift").hasAuthority(AppConstants.ROLE_ADMIN)
-                            .requestMatchers(HttpMethod.DELETE,"/schedule/shift/{shiftId}").hasAuthority(AppConstants.ROLE_ADMIN)
-                            .requestMatchers(HttpMethod.PUT,"/schedule/shift/{shiftId}").hasAuthority(AppConstants.ROLE_ADMIN)
-                            .requestMatchers(HttpMethod.GET,"/schedule/shift/{shiftId}").hasAuthority(AppConstants.ROLE_ADMIN)
-                            .requestMatchers(HttpMethod.GET,"/schedule/shift").hasAuthority(AppConstants.ROLE_ADMIN)
+                            .requestMatchers(HttpMethod.POST,"/notification/add").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/notification/add").permitAll()
+                            .requestMatchers(HttpMethod.PUT,"/notification/add").permitAll()
+                            .requestMatchers(HttpMethod.DELETE,"/notification/add").permitAll()
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)

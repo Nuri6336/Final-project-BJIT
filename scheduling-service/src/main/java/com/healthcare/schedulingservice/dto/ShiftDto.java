@@ -5,19 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScheduleDto {
+public class ShiftDto {
 
-    private Long scheduleId;
     private Long shiftId;
-    private String doctorId;
-    private LocalDate scheduleDate;
-    private LocalTime scheduleTime;
-    private boolean availability;
+    private String shiftName;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }
