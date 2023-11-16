@@ -44,4 +44,14 @@ public class PatientController {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/patient/profile/{patientId}")
+    public ResponseEntity<?> viewProfileByPatientId (@PathVariable String patientId) {
+        try {
+            PatientProfileDto patientProfileDto = patientService.viewProfileByPatientId(patientId);
+            return new ResponseEntity<>(patientProfileDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
 }

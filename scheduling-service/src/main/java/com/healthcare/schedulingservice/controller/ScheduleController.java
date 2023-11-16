@@ -37,6 +37,16 @@ public class ScheduleController {
         }
     }
 
+    @DeleteMapping("/schedule/cancel-appointment/{scheduleId}")
+    public ResponseEntity<?> cancelAppointment ( @PathVariable Long scheduleId) {
+        try {
+            String response = scheduleService.cancelAppointment(scheduleId);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PutMapping("/schedule/change-status/{appointmentId}")
     public ResponseEntity<?> changeStatus ( @PathVariable Long appointmentId) {
         try {

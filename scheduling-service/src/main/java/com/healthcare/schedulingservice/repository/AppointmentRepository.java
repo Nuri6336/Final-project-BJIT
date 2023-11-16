@@ -11,4 +11,5 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
     Optional<AppointmentEntity> findByAppointmentIdAndDoctorId(Long appointmentId, String doctorId);
     List<AppointmentEntity> findByDoctorId(String doctorId);
     List<AppointmentEntity> findByPatientId(String patientId);
+    Optional<AppointmentEntity> findByAppointmentIdAndPatientId(Long appointmentId, String currentUserId);
 }

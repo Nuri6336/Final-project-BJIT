@@ -35,7 +35,8 @@ public class WebSecurityConfig {
                     auth
                             .requestMatchers(HttpMethod.POST, AppConstants.SIGN_IN,AppConstants.SIGN_UP).permitAll()
                             .requestMatchers(HttpMethod.GET, "/users/register/doctor").hasAuthority(AppConstants.ROLE_ADMIN)
-                            .requestMatchers(HttpMethod.GET, "/users/doctor/profile").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/users/doctor/profile").hasAuthority(AppConstants.ROLE_DOCTOR)
+                            .requestMatchers(HttpMethod.GET, "/users/doctor/profile/{doctorId}").permitAll()
                             .requestMatchers(HttpMethod.PUT, "/users/doctor/update-profile").hasAuthority(AppConstants.ROLE_DOCTOR)
                             .requestMatchers(HttpMethod.PUT, "/users/patient/update-profile").hasAuthority(AppConstants.ROLE_PATIENT)
                             .requestMatchers(HttpMethod.GET, "/users/patient/profile").hasAuthority(AppConstants.ROLE_PATIENT)
@@ -49,6 +50,10 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.DELETE, "/users/fileSystem/delete/{id}").hasAuthority(AppConstants.ROLE_PATIENT)
                             .requestMatchers(HttpMethod.DELETE, "/users/fileSystem/doctor/delete/{id}").hasAuthority(AppConstants.ROLE_DOCTOR)
                             .requestMatchers(HttpMethod.PUT, "/users/doctor/update-allocation/{doctorId}").hasAuthority(AppConstants.ROLE_ADMIN)
+
+
+                            .requestMatchers(HttpMethod.GET, "/users/doctor/by-name/{doctorName}").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/users/doctor/by-specialities/{speciality}").permitAll()
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)

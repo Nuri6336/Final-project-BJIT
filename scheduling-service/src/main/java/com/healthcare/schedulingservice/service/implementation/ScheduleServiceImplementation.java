@@ -21,7 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +84,7 @@ public class ScheduleServiceImplementation implements ScheduleService {
     }
 
     @Override
-    public String deleteSchedule(Long scheduleId, ScheduleDto scheduleDto) throws ValueNotFoundException {
+    public String deleteSchedule(Long scheduleId) throws ValueNotFoundException {
         ScheduleEntity scheduleEntity = scheduleRepository
                 .findByScheduleIdAndDoctorId(scheduleId, getCurrentUserId())
                 .orElseThrow(() -> new ValueNotFoundException(AppConstants.USER_NOT_FOUND));
@@ -98,10 +100,32 @@ public class ScheduleServiceImplementation implements ScheduleService {
                 .findByAppointmentIdAndDoctorId(appointmentId, getCurrentUserId())
                 .orElseThrow(() -> new ValueNotFoundException(AppConstants.USER_NOT_FOUND));
 
-        appointmentEntity.setStatus("Done");
+        ScheduleEntity scheduleEntity = appointmentEntity.getScheduleEntity();
 
-        return "Status change to done.";
+        if (scheduleEntity == null) {
+            // Handle the case where the appointment is not associated with a schedule
+            return "Appointment is not associated with a schedule.";
+        }
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        LocalDateTime scheduleEndTime = LocalDateTime.of(
+                scheduleEntity.getScheduleDate(),
+                scheduleEntity.getScheduleTime().plusMinutes(30));
+
+        if (currentDateTime.isAfter(scheduleEndTime)) {
+            // Change the status to "Done" only if the current time is after the schedule end time
+            appointmentEntity.setStatus("Done");
+
+            // Save the updated appointment status to the database
+            appointmentRepository.save(appointmentEntity);
+
+            return "Status changed to Done.";
+        } else {
+            return "Cannot change status until after the schedule end time.";
+        }
     }
+
 
     @Override
     public List<AppointmentDto> doctorViewAppointment(){
@@ -119,24 +143,29 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
     //As a patient what to do
     @Override
-    public String bookAppointment(Long scheduleId) throws NameAlreadyExistsException,ValueNotFoundException {
-        Optional<ScheduleEntity> scheduleEntity = scheduleRepository
-                .findByScheduleIdAndAvailability(scheduleId, false);
+    public String bookAppointment(Long scheduleId) throws NameAlreadyExistsException, ValueNotFoundException {
+        ScheduleEntity scheduleEntity = scheduleRepository
+                .findById(scheduleId)
+                .orElseThrow(() -> new ValueNotFoundException("Use a valid id to book an appointment"));
 
-        if (scheduleEntity.isPresent()){
+        if (!scheduleEntity.isAvailability()) {
             throw new NameAlreadyExistsException("Already booked by another patient.");
         }
 
-        ScheduleEntity scheduleEntity1 = scheduleRepository
-                .findById(scheduleId)
-                .orElseThrow(() -> new ValueNotFoundException("Use valid id to book appointment"));
+        // Check if the schedule's date and time are in the future
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime scheduleDateTime = LocalDateTime.of(scheduleEntity.getScheduleDate(), scheduleEntity.getScheduleTime());
 
-        scheduleEntity1.setAvailability(false);
+        if (currentDateTime.isAfter(scheduleDateTime)) {
+            return "Cannot book an appointment for past time.";
+        }
+
+        scheduleEntity.setAvailability(false);
 
         AppointmentEntity appointment = new AppointmentEntity();
         appointment.setStatus("Booked");
-        appointment.setScheduleEntity(scheduleEntity1);
-        appointment.setDoctorId(scheduleEntity1.getDoctorId());
+        appointment.setScheduleEntity(scheduleEntity);
+        appointment.setDoctorId(scheduleEntity.getDoctorId());
         appointment.setPatientId(getCurrentUserId());
 
         appointmentRepository.save(appointment);
@@ -145,7 +174,7 @@ public class ScheduleServiceImplementation implements ScheduleService {
         notificationRequest.setMessage("Appointment booked for patientId " + getCurrentUserId());
         notificationRequest.setNotificationType("Appointment");
         notificationRequest.setStatus("UNREAD");
-        notificationRequest.setRecipientId(scheduleEntity1.getDoctorId());
+        notificationRequest.setRecipientId(scheduleEntity.getDoctorId());
 
         try {
             notificationFeingClient.sendNotification(notificationRequest);
@@ -155,6 +184,7 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
         return "Appointment booked for patientId " + getCurrentUserId();
     }
+
 
     @Override
     public List<AppointmentDto> patientViewAppointment(){
@@ -243,5 +273,41 @@ public class ScheduleServiceImplementation implements ScheduleService {
 
         return "Schedules added to the database.";
     }
+
+    @Override
+    public String cancelAppointment(Long appointmentId) throws ValueNotFoundException {
+        AppointmentEntity appointmentEntity = appointmentRepository
+                .findByAppointmentIdAndPatientId(appointmentId, getCurrentUserId())
+                .orElseThrow(() -> new ValueNotFoundException("Invalid appointment id"));
+
+
+        ScheduleEntity scheduleEntity = appointmentEntity.getScheduleEntity();
+
+        if (scheduleEntity != null) {
+            LocalDate currentDate = LocalDate.now();
+            LocalTime currentTime = LocalTime.now();
+            LocalDateTime currentDateTime = LocalDateTime.of(currentDate, currentTime);
+
+            LocalDateTime scheduleDateTime = LocalDateTime.of(scheduleEntity.getScheduleDate(), scheduleEntity.getScheduleTime());
+
+            // Check if the schedule time is more than 6 hours from the current time
+            if (currentDateTime.plusHours(6).isAfter(scheduleDateTime)) {
+                return "Cannot cancel appointment. Less than 6 hours remaining.";
+            }
+
+            // Set the availability status back to true in the schedule table
+            scheduleEntity.setAvailability(true);
+            // Update the schedule in the database
+            scheduleRepository.save(scheduleEntity);
+        }
+
+        appointmentRepository.delete(appointmentEntity);
+
+        // Optionally, you can send a notification or perform other actions here
+
+        return "Appointment canceled successfully.";
+    }
+
+
 
 }

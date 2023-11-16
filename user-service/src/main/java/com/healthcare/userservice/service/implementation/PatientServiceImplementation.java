@@ -68,6 +68,20 @@ public class PatientServiceImplementation implements PatientService {
         return returnDto;
     }
 
+    @Override
+    public PatientProfileDto viewProfileByPatientId(String patientId) throws Exception {
+
+        PatientEntity patientEntity = patientRepository.findByPatientUniqueId(patientId)
+                .orElseThrow(()->new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
+
+        UserEntity userEntity = userRepository.findByUniqueId(patientId)
+                .orElseThrow(()->new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
+
+        PatientProfileDto returnDto = getPatientProfileDto(patientEntity, userEntity);
+
+        return returnDto;
+    }
+
     private static PatientProfileDto getPatientProfileDto(PatientEntity patientEntity, UserEntity userEntity) {
         PatientProfileDto returnDto = new PatientProfileDto();
 

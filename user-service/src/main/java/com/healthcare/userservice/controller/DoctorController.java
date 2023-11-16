@@ -42,4 +42,14 @@ public class DoctorController {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/doctor/profile/{doctorId}")
+    public ResponseEntity<?> viewProfileByDoctorId (@PathVariable String doctorId) {
+        try {
+            DoctorProfileDto doctorProfileDto = doctorService.viewProfileByUniqueId(doctorId);
+            return new ResponseEntity<>(doctorProfileDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
 }

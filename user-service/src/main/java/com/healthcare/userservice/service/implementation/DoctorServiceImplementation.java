@@ -16,6 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class DoctorServiceImplementation implements DoctorService {
@@ -45,6 +48,20 @@ public class DoctorServiceImplementation implements DoctorService {
     @Override
     public DoctorProfileDto viewProfile() throws Exception {
         String doctorId = getCurrentUser().getUniqueId();
+
+        DoctorEntity doctorEntity = doctorRepository.findByDoctorUniqueID(doctorId)
+                .orElseThrow(()->new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
+
+        UserEntity userEntity = userRepository.findByUniqueId(doctorId)
+                .orElseThrow(()->new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
+
+        DoctorProfileDto returnDto = getDoctorProfileDto(doctorEntity, userEntity);
+
+        return returnDto;
+    }
+
+    @Override
+    public DoctorProfileDto viewProfileByUniqueId(String doctorId) throws Exception {
 
         DoctorEntity doctorEntity = doctorRepository.findByDoctorUniqueID(doctorId)
                 .orElseThrow(()->new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
@@ -100,5 +117,79 @@ public class DoctorServiceImplementation implements DoctorService {
         // Save the updated entity
         doctorRepository.save(doctorEntity);
         return "Successfully stored";
+    }
+
+    //For search doctor by doctor name
+    @Override
+    public List<DoctorProfileDto> findDoctorsByName(String doctorName) throws Exception {
+        List<UserEntity> userEntities = userRepository.findByFname(doctorName);
+
+        if (userEntities.isEmpty()) {
+            throw new UsernameNotFoundException("No users found with the given name");
+        }
+
+        return userEntities.stream()
+                .filter(userEntity -> userEntity.getUniqueId().startsWith("DOC"))
+                .flatMap(userEntity -> getDoctorProfileDtos(userEntity).stream())
+                .collect(Collectors.toList());
+    }
+
+    private List<DoctorProfileDto> getDoctorProfileDtos(UserEntity userEntity) {
+        DoctorEntity doctorEntity = doctorRepository.findByDoctorUniqueID(userEntity.getUniqueId())
+                .orElseThrow(() -> new UsernameNotFoundException("No doctor found for the user"));
+
+        DoctorProfileDto returnDto = new DoctorProfileDto();
+        returnDto.setAddress(doctorEntity.getAddress());
+        returnDto.setAge(doctorEntity.getAge());
+        returnDto.setProfessionalDescription(doctorEntity.getProfessionalDescription());
+        returnDto.setQualifications(doctorEntity.getQualifications());
+        returnDto.setSpecialities(doctorEntity.getSpecialities());
+        returnDto.setRoomNo(doctorEntity.getRoomNo());
+
+        returnDto.setUniqueId(userEntity.getUniqueId());
+        returnDto.setGender(userEntity.getGender());
+        returnDto.setEmail(userEntity.getEmail());
+        returnDto.setFname(userEntity.getFname());
+        returnDto.setLname(userEntity.getLname());
+        returnDto.setMobile(userEntity.getMobile());
+
+        return List.of(returnDto);
+    }
+
+    // Service method for finding doctors by specialty
+    @Override
+    public List<DoctorProfileDto> findDoctorsBySpecialty(String specialty) {
+        List<DoctorEntity> doctorEntities = doctorRepository.findBySpecialities(specialty);
+
+        if (doctorEntities.isEmpty()) {
+            throw new UsernameNotFoundException("No doctors found with the given specialty");
+        }
+
+        return doctorEntities.stream()
+                .map(this::getDoctorProfileDtoByDoctorEntity)
+                .collect(Collectors.toList());
+    }
+
+    private DoctorProfileDto getDoctorProfileDtoByDoctorEntity(DoctorEntity doctorEntity) {
+        DoctorProfileDto returnDto = new DoctorProfileDto();
+
+        returnDto.setAddress(doctorEntity.getAddress());
+        returnDto.setAge(doctorEntity.getAge());
+        returnDto.setProfessionalDescription(doctorEntity.getProfessionalDescription());
+        returnDto.setQualifications(doctorEntity.getQualifications());
+        returnDto.setSpecialities(doctorEntity.getSpecialities());
+        returnDto.setRoomNo(doctorEntity.getRoomNo());
+
+        UserEntity userEntity = userRepository.findByUniqueId(doctorEntity.getDoctorUniqueID())
+                .orElseThrow(() -> new UsernameNotFoundException(AppConstants.USER_NOT_FOUND));
+
+        returnDto.setUniqueId(userEntity.getUniqueId());
+        returnDto.setGender(userEntity.getGender());
+        returnDto.setEmail(userEntity.getEmail());
+        returnDto.setFname(userEntity.getFname());
+        returnDto.setLname(userEntity.getLname());
+        returnDto.setMobile(userEntity.getMobile());
+
+        return returnDto;
     }
 }

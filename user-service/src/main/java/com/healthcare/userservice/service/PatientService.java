@@ -9,4 +9,5 @@ public interface PatientService {
 
     String updatePatientInfo(PatientEditDto patientEditDto) throws Exception;
     PatientProfileDto viewProfile() throws Exception;
+    PatientProfileDto viewProfileByPatientId(String patientId) throws Exception;
 }

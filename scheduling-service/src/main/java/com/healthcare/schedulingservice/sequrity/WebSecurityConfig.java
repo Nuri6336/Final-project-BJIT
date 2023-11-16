@@ -35,6 +35,7 @@ public class WebSecurityConfig {
                     auth
                             .requestMatchers(HttpMethod.POST,"/schedule/add").hasAuthority(AppConstants.ROLE_DOCTOR)
                             .requestMatchers(HttpMethod.POST,"/schedule/book-appointment/{scheduleId}").hasAuthority(AppConstants.ROLE_PATIENT)
+                            .requestMatchers(HttpMethod.DELETE,"/schedule/cancel-appointment/{scheduleId}").hasAuthority(AppConstants.ROLE_PATIENT)
                             .requestMatchers(HttpMethod.GET,"/schedule/change-status/{appointmentId}").hasAuthority(AppConstants.ROLE_DOCTOR)
                             .requestMatchers(HttpMethod.GET,"/schedule/doctor/view-appointment").hasAuthority(AppConstants.ROLE_DOCTOR)
                             .requestMatchers(HttpMethod.GET,"/schedule/patient/view-appointment").hasAuthority(AppConstants.ROLE_PATIENT)

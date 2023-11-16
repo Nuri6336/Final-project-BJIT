@@ -23,7 +23,11 @@ public class DoctorEntity {
     private String address;
     private String age;
     private String professionalDescription;
+
+    @ElementCollection
     private String[] qualifications;
+
+    @ElementCollection
     private String[] specialities;
     private String roomNo;
     private String dutySlot;
